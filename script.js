@@ -2,6 +2,12 @@ async function checkValue() {
   const type = document.getElementById('cardType').value;
   const amount = parseFloat(document.getElementById('cardAmount').value);
   const currencySymbol = document.getElementById('currency').value;
+  const resultEl = document.getElementById('result');
+  const rateInfoEl = document.getElementById('rateInfo');
+  const spinnerEl = document.getElementById('loadingSpinner');
+
+  resultEl.innerText = "";
+  rateInfoEl.innerText = "";
 
   if (isNaN(amount) || amount <= 0) {
     alert("Please enter a valid card amount.");
@@ -9,7 +15,8 @@ async function checkValue() {
   }
 
   try {
-    // Fetch card payout rates
+    spinnerEl.classList.remove('hidden'); // Show spinner
+
     const res = await fetch('data/cardValues.json');
     if (!res.ok) throw new Error("Failed to load card rates.");
     const rates = await res.json();
@@ -20,14 +27,12 @@ async function checkValue() {
     }
 
     const usdValue = amount * rates[type];
-    if (isNaN(usdValue)) throw new Error("Invalid USD value calculated.");
 
-    // Determine target currency code
+    // Get currency code from symbol
     let currencyCode = "USD";
     if (currencySymbol === "₦") currencyCode = "NGN";
     else if (currencySymbol === "€") currencyCode = "EUR";
 
-    // Fetch exchange rate
     const exchangeRes = await fetch(`https://api.exchangerate.host/convert?from=USD&to=${currencyCode}`);
     if (!exchangeRes.ok) throw new Error("Currency conversion failed.");
     const data = await exchangeRes.json();
@@ -39,10 +44,14 @@ async function checkValue() {
     }
 
     const convertedValue = usdValue * rate;
-    document.getElementById('result').innerText = `Estimated payout: ${currencySymbol}${convertedValue.toFixed(2)}`;
+
+    resultEl.innerText = `Estimated payout: ${currencySymbol}${convertedValue.toFixed(2)}`;
+    rateInfoEl.innerText = `1 USD = ${rate.toFixed(2)} ${currencyCode}`;
     
   } catch (error) {
     console.error("Error:", error);
     alert("Something went wrong. Please try again.");
+  } finally {
+    spinnerEl.classList.add('hidden'); // Hide spinner
   }
 }
