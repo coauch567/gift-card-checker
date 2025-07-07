@@ -1,7 +1,7 @@
 {
-  "Amazon": 0.85,
-  "iTunes": 0.80,
-  "Google Play": 0.78,
-  "Steam": 0.75,
-  "Visa": 0.90
+  "Amazon": 0.40,
+  "iTunes": 0.50,
+  "Google Play": 0.50,
+  "Steam": 0.55,
+  "Visa": 0.40
 }
